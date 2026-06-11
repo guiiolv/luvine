@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ApiError> handleNotFound(EntityNotFoundException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiError> handleNotFound(HttpServletRequest request) {
 
         log.warn("event=entity_not_found path={}", request.getRequestURI());
 
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiError> handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiError> handleAuthentication(HttpServletRequest request) {
 
         log.warn("event=authentication_failed path={}", request.getRequestURI());
 
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<ApiError> handleDenied(AuthorizationDeniedException ex, HttpServletRequest request) {
+    public ResponseEntity<ApiError> handleDenied(HttpServletRequest request) {
 
         log.warn("event=authorization_denied path={}", request.getRequestURI());
 
