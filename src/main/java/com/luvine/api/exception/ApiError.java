@@ -14,12 +14,16 @@ public class ApiError {
     private final List<String> details;
     private final String path;
 
-    public ApiError(Integer status, String error, String message, List<String> details, String path) {
+    private ApiError(Integer status, String error, String message, List<String> details, String path) {
         this.timestamp = Instant.now();
         this.status = status;
         this.error = error;
         this.message = message;
         this.details = details == null ? List.of() : List.copyOf(details);
         this.path = path;
+    }
+
+    public static ApiError create(Integer status, String error, String message, List<String> details, String path) {
+        return new ApiError(status, error, message, details, path);
     }
 }
