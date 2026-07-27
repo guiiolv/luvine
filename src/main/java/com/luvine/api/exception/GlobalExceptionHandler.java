@@ -1,6 +1,7 @@
 package com.luvine.api.exception;
 
 import com.luvine.common.domain.exception.BusinessRuleValidationException;
+import com.luvine.common.domain.exception.CryptographyException;
 import com.luvine.common.domain.exception.UnauthorizedException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,6 +53,23 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiError.of(
+                        ex.getMessage(),
+                        request.getRequestURI()
+                ));
+    }
+
+    @ExceptionHandler(CryptographyException.class)
+    public ResponseEntity<ApiError> handleCryptography(CryptographyException ex, HttpServletRequest request) {
+
+        log.error(
+                "Falha durante o processamento de uma operação criptográfica. Método: {}, URI: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiError.of(
                         ex.getMessage(),
                         request.getRequestURI()
