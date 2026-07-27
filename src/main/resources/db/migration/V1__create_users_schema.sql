@@ -3,7 +3,7 @@ CREATE SCHEMA IF NOT EXISTS users;
 CREATE SEQUENCE users.user_credentials_id_seq START WITH 1 INCREMENT BY 50;
 
 CREATE TABLE users.user_credentials(
-    id BIGINT NOT NULL PRIMARY KEY nextval('users.user_credentials_id_seq'),
+    id BIGINT PRIMARY KEY default nextval('users.user_credentials_id_seq'),
     public_id UUID UNIQUE NOT NULL,
     email VARCHAR(255) NOT NULL,
     first_name VARCHAR(100) NOT NULL,
