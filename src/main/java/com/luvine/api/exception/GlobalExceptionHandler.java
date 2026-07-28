@@ -1,9 +1,6 @@
 package com.luvine.api.exception;
 
-import com.luvine.common.domain.exception.BusinessRuleValidationException;
-import com.luvine.common.domain.exception.CryptographyException;
-import com.luvine.common.domain.exception.NotificationDeliveryException;
-import com.luvine.common.domain.exception.UnauthorizedException;
+import com.luvine.common.domain.exception.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +79,24 @@ public class GlobalExceptionHandler {
 
         log.error(
                 "Falha durante o envio de uma notificação. Método: {}, URI: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiError.of(
+                        ex.getMessage(),
+                        request.getRequestURI()
+                ));
+    }
+
+    @ExceptionHandler(EmailTemplateNotConfiguredException.class)
+    public ResponseEntity<ApiError> handleNotConfigured(
+            EmailTemplateNotConfiguredException ex, HttpServletRequest request) {
+
+        log.error(
+                "Template de e-mail não configurado. Método: {}, URI: {}",
                 request.getMethod(),
                 request.getRequestURI(),
                 ex

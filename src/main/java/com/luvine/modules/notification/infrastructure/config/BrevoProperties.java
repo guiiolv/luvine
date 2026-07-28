@@ -8,8 +8,8 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "app.brevo")
 public record BrevoProperties(
         String apiKey,
-        String recipientEmail,
-        String recipientName,
+        String senderEmail,
+        String senderName,
         Map<EmailTemplate, Long> templates
 ) {
 }
