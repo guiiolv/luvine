@@ -109,6 +109,25 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(InvalidEmailVerificationException.class)
+    public ResponseEntity<ApiError> handleInvalidEmail(
+            InvalidEmailVerificationException ex,
+            HttpServletRequest request) {
+
+        log.warn(
+                "Falha na verificação de e-mail. Método: {}, URI: {}, Motivo: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiError.of(
+                        ex.getMessage(),
+                        request.getRequestURI()
+                ));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
 

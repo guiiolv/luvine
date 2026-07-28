@@ -1,10 +1,7 @@
 package com.luvine.modules.auth.domain.entity;
 
 import com.luvine.common.domain.AggregateRoot;
-import com.luvine.modules.auth.domain.rules.CodeHash;
-import com.luvine.modules.auth.domain.rules.CodeMustMatchRule;
-import com.luvine.modules.auth.domain.rules.CodeMustNotBeExpiredRule;
-import com.luvine.modules.auth.domain.rules.CodeMustNotBeVerifiedRule;
+import com.luvine.modules.auth.domain.rules.*;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -66,6 +63,7 @@ public class EmailVerification extends AggregateRoot<Long> {
     }
 
     public void verify(CodeHash providedCode) {
+        checkRule(new CodeMustNotBeInvalidatedRule(this.invalidatedAt));
         checkRule(new CodeMustNotBeExpiredRule(this.expiresAt));
         checkRule(new CodeMustNotBeVerifiedRule(this.verifiedAt));
         checkRule(new CodeMustMatchRule(this.verificationCode, providedCode));
