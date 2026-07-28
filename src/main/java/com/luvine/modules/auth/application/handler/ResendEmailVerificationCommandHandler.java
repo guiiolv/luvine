@@ -1,6 +1,5 @@
 package com.luvine.modules.auth.application.handler;
 
-import com.luvine.common.domain.exception.InvalidEmailVerificationException;
 import com.luvine.common.domain.exception.UnauthorizedException;
 import com.luvine.modules.auth.application.command.ResendEmailVerificationCommand;
 import com.luvine.modules.auth.domain.entity.EmailVerification;
