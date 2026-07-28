@@ -1,9 +1,11 @@
 package com.luvine.api.auth.dto.request;
 
+import com.luvine.api.auth.validator.PasswordMatch;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+@PasswordMatch
 public record RegisterRequest(
         @NotBlank(message = "Informe o seu e-mail.")
         @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "Esse e-mail é inválido.")
