@@ -41,6 +41,9 @@ public class EmailVerification extends AggregateRoot<Long> {
     @Column(name = "verified_at")
     private Instant verifiedAt;
 
+    @Column(name = "invalidatedAt")
+    private Instant invalidatedAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -54,6 +57,7 @@ public class EmailVerification extends AggregateRoot<Long> {
         this.verificationCode = verificationCode;
         this.createdAt = Instant.now();
         this.expiresAt = this.createdAt.plus(15, ChronoUnit.MINUTES);
+        this.invalidatedAt = null;
         this.verifiedAt = null;
     }
 
