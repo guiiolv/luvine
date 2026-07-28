@@ -3,6 +3,9 @@ package com.luvine.modules.auth.application.handler;
 import com.luvine.common.domain.exception.UnauthorizedException;
 import com.luvine.common.domain.util.EmailMaskUtil;
 import com.luvine.modules.auth.application.command.RegisterCommand;
+import com.luvine.modules.auth.application.command.RequestEmailVerificationCommand;
+import com.luvine.modules.notification.application.command.SendEmailVerificationCodeCommand;
+import com.luvine.modules.notification.application.handler.SendEmailVerificationCodeCommandHandler;
 import com.luvine.modules.user.domain.entity.UserCredentials;
 import com.luvine.modules.user.domain.valueobject.Email;
 import com.luvine.modules.user.domain.valueobject.FirstName;
@@ -22,10 +25,18 @@ public class RegisterCommandHandler {
 
     private final UserCredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RequestEmailVerificationCommandHandler verificationCommandHandler;
+    private final SendEmailVerificationCodeCommandHandler verificationCodeCommandHandler;
 
-    public RegisterCommandHandler(UserCredentialsRepository credentialsRepository, PasswordEncoder passwordEncoder) {
+    public RegisterCommandHandler(
+            UserCredentialsRepository credentialsRepository,
+            PasswordEncoder passwordEncoder,
+            RequestEmailVerificationCommandHandler verificationCommandHandler
+            , SendEmailVerificationCodeCommandHandler verificationCodeCommandHandler) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
+        this.verificationCommandHandler = verificationCommandHandler;
+        this.verificationCodeCommandHandler = verificationCodeCommandHandler;
     }
 
     @Transactional
@@ -59,6 +70,30 @@ public class RegisterCommandHandler {
                 "Usuário cadastrado com sucesso. Id público: {}, E-mail: {}",
                 publicId,
                 maskedEmail
+        );
+
+        log.info(
+                "Gerando código de verificação de e-mail. Usuário: {}",
+                publicId
+        );
+
+        String rawCode = verificationCommandHandler.handle(new RequestEmailVerificationCommand(command.email()));
+
+        log.info(
+                "Solicitando envio do e-mail de verificação. Usuário: {}, E-mail: {}",
+                publicId,
+                maskedEmail
+        );
+
+        verificationCodeCommandHandler.handle(new SendEmailVerificationCodeCommand(
+                command.email(),
+                command.firstName(),
+                rawCode
+        ));
+
+        log.info(
+                "Fluxo de cadastro concluído. Usuário: {}",
+                publicId
         );
     }
 }

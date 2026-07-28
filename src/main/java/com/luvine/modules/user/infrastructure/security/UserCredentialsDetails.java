@@ -40,6 +40,6 @@ public class UserCredentialsDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return credentials.isActive();
+        return credentials.isActive() && credentials.isEmailVerified();
     }
 }

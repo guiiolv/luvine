@@ -27,7 +27,7 @@ public class RequestEmailVerificationCommandHandler {
     }
 
     @Transactional
-    public void handle(RequestEmailVerificationCommand command) {
+    public String handle(RequestEmailVerificationCommand command) {
         UserCredentials credentials = credentialsRepository.findByEmail(new Email(command.email()))
                 .orElseThrow(() -> new UnauthorizedException("Credenciais inválidas."));
 
@@ -45,5 +45,7 @@ public class RequestEmailVerificationCommandHandler {
         );
 
         verificationRepository.save(verification);
+
+        return rawCode;
     }
 }
