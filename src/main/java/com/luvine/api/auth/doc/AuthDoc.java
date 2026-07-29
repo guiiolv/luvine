@@ -2,6 +2,8 @@ package com.luvine.api.auth.doc;
 
 import com.luvine.api.auth.dto.request.LoginRequest;
 import com.luvine.api.auth.dto.request.RegisterRequest;
+import com.luvine.api.auth.dto.request.ResendEmailVerificationRequest;
+import com.luvine.api.auth.dto.request.VerifyEmailRequest;
 import com.luvine.api.auth.dto.response.AuthTokensResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -42,4 +44,20 @@ public interface AuthDoc {
     ResponseEntity<AuthTokensResponse> refresh(
             @CookieValue("refreshToken") String refreshToken,
             HttpServletRequest httpRequest);
+
+    @Operation(summary = "Confirmar o e-mail através do código de verificação")
+    @ApiResponse(responseCode = "200", description = "E-mail verificado com sucesso", content = @Content)
+    @ApiResponse(responseCode = "401", description = "Credenciais inválidas ou código não encontrado", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Código inválido, expirado, já utilizado" +
+            " ou e-mail já verificado", content = @Content)
+    @PostMapping("/verify-email")
+    ResponseEntity<Void> verifyEmail(@RequestBody @Valid VerifyEmailRequest request);
+
+    @Operation(summary = "Reenviar o código de verificação de e-mail")
+    @ApiResponse(responseCode = "202", description = "Novo código de verificação enviado com sucesso", content = @Content)
+    @ApiResponse(responseCode = "401", description = "Credenciais inválidas", content = @Content)
+    @ApiResponse(responseCode = "409", description = "E-mail já verificado ou cooldown de" +
+            " reenvio ainda ativo", content = @Content)
+    @PostMapping("/resend-verification-email")
+    ResponseEntity<Void> resendVerificationEmail(@RequestBody @Valid ResendEmailVerificationRequest request);
 }

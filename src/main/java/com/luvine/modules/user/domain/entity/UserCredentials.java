@@ -12,6 +12,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Entity
@@ -146,6 +147,20 @@ public class UserCredentials extends AggregateRoot<Long> {
         this.verificationEmailRequestCount = 0;
     }
 
+    public void requestEmailVerification(Instant now) {
+        if (this.lastVerificationEmailSentAt != null &&
+                this.lastVerificationEmailSentAt.isBefore(now.minus(1, ChronoUnit.HOURS))) {
+            resetEmailVerificationRequests();
+            this.lastVerificationEmailSentAt = null;
+        }
+
+        Instant nextAllowedRequest = calculateNextAllowedRequest();
+
+        checkRule(new VerificationEmailRequestMustRespectRateLimitRule(now, nextAllowedRequest));
+
+        markVerificationEmailSent();
+    }
+
     public void activate() {
         checkRule(new UserMustBeInactiveRule(this.active));
         this.active = true;
@@ -154,5 +169,13 @@ public class UserCredentials extends AggregateRoot<Long> {
     public void deactivate() {
         checkRule(new UserMustBeActiveRule(this.active));
         this.active = false;
+    }
+
+    private Instant calculateNextAllowedRequest() {
+        if (this.lastVerificationEmailSentAt == null) return null;
+
+        long delaySeconds = (this.verificationEmailRequestCount + 1) * 120L;
+
+        return this.lastVerificationEmailSentAt.plusSeconds(delaySeconds);
     }
 }
