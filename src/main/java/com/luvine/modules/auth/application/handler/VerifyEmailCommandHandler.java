@@ -2,7 +2,7 @@ package com.luvine.modules.auth.application.handler;
 
 import com.luvine.common.domain.exception.InvalidEmailVerificationException;
 import com.luvine.common.domain.exception.UnauthorizedException;
-import com.luvine.modules.auth.application.command.EmailVerifyCommand;
+import com.luvine.modules.auth.application.command.VerifyEmailCommand;
 import com.luvine.modules.auth.domain.entity.EmailVerification;
 import com.luvine.modules.auth.domain.rules.CodeHash;
 import com.luvine.modules.auth.infrastructure.repository.EmailVerificationRepository;
@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class EmailVerifyCommandHandler {
+public class VerifyEmailCommandHandler {
 
     private final UserCredentialsRepository credentialsRepository;
     private final EmailVerificationRepository verificationRepository;
 
-    public EmailVerifyCommandHandler(
+    public VerifyEmailCommandHandler(
             UserCredentialsRepository credentialsRepository,
             EmailVerificationRepository verificationRepository) {
         this.credentialsRepository = credentialsRepository;
@@ -26,7 +26,7 @@ public class EmailVerifyCommandHandler {
     }
 
     @Transactional
-    public void handle(EmailVerifyCommand command) {
+    public void handle(VerifyEmailCommand command) {
         UserCredentials credentials = credentialsRepository.findByEmail(new Email(command.email()))
                 .orElseThrow(() -> new UnauthorizedException("Credenciais inválidas."));
 

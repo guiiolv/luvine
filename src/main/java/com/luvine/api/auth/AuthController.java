@@ -3,14 +3,12 @@ package com.luvine.api.auth;
 import com.luvine.api.auth.doc.AuthDoc;
 import com.luvine.api.auth.dto.request.LoginRequest;
 import com.luvine.api.auth.dto.request.RegisterRequest;
+import com.luvine.api.auth.dto.request.ResendEmailVerificationRequest;
+import com.luvine.api.auth.dto.request.VerifyEmailRequest;
 import com.luvine.api.auth.dto.response.AuthTokensResponse;
-import com.luvine.modules.auth.application.command.LoginCommand;
-import com.luvine.modules.auth.application.command.RefreshTokenCommand;
-import com.luvine.modules.auth.application.command.RegisterCommand;
+import com.luvine.modules.auth.application.command.*;
 import com.luvine.modules.auth.application.dto.AuthTokensDto;
-import com.luvine.modules.auth.application.handler.LoginCommandHandler;
-import com.luvine.modules.auth.application.handler.RefreshTokenCommandHandler;
-import com.luvine.modules.auth.application.handler.RegisterCommandHandler;
+import com.luvine.modules.auth.application.handler.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,14 +24,20 @@ public class AuthController implements AuthDoc {
     private final RegisterCommandHandler registerCommandHandler;
     private final LoginCommandHandler loginCommandHandler;
     private final RefreshTokenCommandHandler refreshTokenCommandHandler;
+    private final VerifyEmailCommandHandler verifyEmailCommandHandler;
+    private final ResendEmailVerificationCommandHandler resendEmailVerificationCommandHandler;
 
     public AuthController(
             RegisterCommandHandler registerCommandHandler,
             LoginCommandHandler loginCommandHandler,
-            RefreshTokenCommandHandler refreshTokenCommandHandler) {
+            RefreshTokenCommandHandler refreshTokenCommandHandler,
+            VerifyEmailCommandHandler verifyEmailCommandHandler,
+            ResendEmailVerificationCommandHandler resendEmailVerificationCommandHandler) {
         this.registerCommandHandler = registerCommandHandler;
         this.loginCommandHandler = loginCommandHandler;
         this.refreshTokenCommandHandler = refreshTokenCommandHandler;
+        this.verifyEmailCommandHandler = verifyEmailCommandHandler;
+        this.resendEmailVerificationCommandHandler = resendEmailVerificationCommandHandler;
     }
 
     @Override
@@ -103,5 +107,24 @@ public class AuthController implements AuthDoc {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new AuthTokensResponse(tokensDto.accessToken(), null));
+    }
+
+    @Override
+    public ResponseEntity<Void> verifyEmail(VerifyEmailRequest request) {
+        verifyEmailCommandHandler.handle(new VerifyEmailCommand(
+                request.email(),
+                request.code()
+        ));
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> resendVerificationEmail(ResendEmailVerificationRequest request) {
+        resendEmailVerificationCommandHandler.handle(new ResendEmailVerificationCommand(
+                request.email()
+        ));
+
+        return ResponseEntity.ok().build();
     }
 }
