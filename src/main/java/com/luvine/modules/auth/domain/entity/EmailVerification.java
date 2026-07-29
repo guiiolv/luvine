@@ -19,7 +19,7 @@ public class EmailVerification extends AggregateRoot<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "email_verifications_seq")
-    @SequenceGenerator(name = "email_verifications_seq", sequenceName = "email_verifications_id_seq")
+    @SequenceGenerator(name = "email_verifications_seq", sequenceName = "auth.email_verifications_id_seq")
     private Long id;
 
     @Column(name = "user_public_id", nullable = false, updatable = false)

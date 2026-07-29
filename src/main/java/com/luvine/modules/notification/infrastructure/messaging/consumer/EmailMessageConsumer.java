@@ -1,14 +1,17 @@
 package com.luvine.modules.notification.infrastructure.messaging.consumer;
 
+import com.luvine.common.domain.util.EmailMaskUtil;
 import com.luvine.modules.notification.domain.service.EmailSenderService;
 import com.luvine.modules.notification.domain.valueobject.EmailTemplate;
 import com.luvine.modules.notification.infrastructure.messaging.config.NotificationRabbitMQConfig;
 import com.luvine.modules.notification.infrastructure.messaging.message.SendEmailVerificationCodeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@Slf4j
 @Component
 public class EmailMessageConsumer {
 
@@ -23,6 +26,12 @@ public class EmailMessageConsumer {
             containerFactory = "simpleRabbitListenerContainerFactory"
     )
     public void publish(SendEmailVerificationCodeMessage message) {
+        log.info(
+                "Mensagem de envio de e-mail recebida da fila. Template: {}, Destinatário: {}",
+                EmailTemplate.EMAIL_VERIFICATION_CODE,
+                EmailMaskUtil.mask(message.recipientEmail())
+        );
+
         senderService.send(
                 EmailTemplate.EMAIL_VERIFICATION_CODE,
                 message.recipientEmail(),
@@ -36,6 +45,12 @@ public class EmailMessageConsumer {
                         "digit5", String.valueOf(message.code().charAt(4)),
                         "digit6", String.valueOf(message.code().charAt(5))
                 )
+        );
+
+        log.info(
+                "Mensagem de envio de e-mail processada com sucesso. Template: {}, Destinatário: {}",
+                EmailTemplate.EMAIL_VERIFICATION_CODE,
+                EmailMaskUtil.mask(message.recipientEmail())
         );
     }
 }
