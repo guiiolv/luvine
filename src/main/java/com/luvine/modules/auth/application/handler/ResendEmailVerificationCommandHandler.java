@@ -6,6 +6,8 @@ import com.luvine.modules.auth.application.command.ResendEmailVerificationComman
 import com.luvine.modules.auth.domain.entity.EmailVerification;
 import com.luvine.modules.auth.domain.rules.CodeHash;
 import com.luvine.modules.auth.infrastructure.repository.EmailVerificationRepository;
+import com.luvine.modules.notification.application.command.SendEmailVerificationCodeCommand;
+import com.luvine.modules.notification.application.handler.SendEmailVerificationCodeCommandHandler;
 import com.luvine.modules.user.domain.entity.UserCredentials;
 import com.luvine.modules.user.domain.valueobject.Email;
 import com.luvine.modules.user.infrastructure.repository.UserCredentialsRepository;
@@ -21,12 +23,15 @@ public class ResendEmailVerificationCommandHandler {
 
     private final UserCredentialsRepository credentialsRepository;
     private final EmailVerificationRepository verificationRepository;
+    private final SendEmailVerificationCodeCommandHandler verificationCodeCommandHandler;
 
     public ResendEmailVerificationCommandHandler(
             UserCredentialsRepository credentialsRepository,
-            EmailVerificationRepository verificationRepository) {
+            EmailVerificationRepository verificationRepository,
+            SendEmailVerificationCodeCommandHandler verificationCodeCommandHandler) {
         this.credentialsRepository = credentialsRepository;
         this.verificationRepository = verificationRepository;
+        this.verificationCodeCommandHandler = verificationCodeCommandHandler;
     }
 
     @Transactional
@@ -58,6 +63,17 @@ public class ResendEmailVerificationCommandHandler {
 
         log.info(
                 "Novo código de verificação gerado com sucesso. Usuário: {}",
+                credentials.getPublicId()
+        );
+
+        verificationCodeCommandHandler.handle(new SendEmailVerificationCodeCommand(
+                credentials.getEmail().value(),
+                credentials.getFirstName().value(),
+                rawCode
+        ));
+
+        log.info(
+                "Solicitação de reenvio do e-mail de verificação concluída. Usuário: {}",
                 credentials.getPublicId()
         );
     }
