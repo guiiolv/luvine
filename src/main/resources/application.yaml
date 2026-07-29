@@ -19,3 +19,9 @@ app:
   jwt:
     private-key: classpath:/security/private.pem
     public-key: classpath:/security/public.pem
+  brevo:
+    api-key: ${BREVO_API_KEY}
+    sender-email: ${BREVO_SENDER_EMAIL}
+    sender-name: ${BREVO_SENDER_NAME}
+    templates:
+      email-verification-code: ${BREVO_TEMPLATE_EMAIL_VERIFICATION_CODE}
